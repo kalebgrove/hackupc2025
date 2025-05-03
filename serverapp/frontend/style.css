@@ -1,9 +1,9 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: monospace; /* Retro font */
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
-    color: #333;
+    background-color: #000; /* Dark background */
+    color: #eee; /* Light text */
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -13,8 +13,8 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
-    background-color: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #000; /* Slightly lighter container background */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Darker shadow */
     border-radius: 8px;
     flex: 1;
     display: flex;
@@ -24,24 +24,24 @@ body {
 header {
     text-align: center;
     padding: 20px 0;
-    border-bottom: 1px solid #ddd;
-    display: flex; /* Use flexbox for layout */
+    border-bottom: 1px solid #555; /* Darker border */
+    display: flex;
     flex-direction: column;
-    align-items: center; /* Center items horizontally */
+    align-items: center;
 }
 
 h1 {
     margin: 0;
-    font-size: 24px;
+    font-size: 28px; /* Larger heading */
     margin-bottom: 10px;
+    color: #fff; /* Gold color for heading (retro) */
 }
 
 #blackout-status {
     font-size: 16px;
-    color: green;
+    color: #888; /* Grey for blackout status */
     margin-bottom: 10px;
 }
-
 
 main {
     flex: 1;
@@ -53,12 +53,14 @@ main {
 section {
     padding: 20px;
     border-radius: 8px;
-    background-color: #f9f9f9;
+    background-color: #333; /* Darker section background */
+    border: 1px solid #444; /* Darker border */
 }
 
 h2 {
     margin: 0 0 10px 0;
-    font-size: 20px;
+    font-size: 22px; /* Larger heading */
+    color: green; /* Green for section heading */
 }
 
 #flight-table-container {
@@ -69,51 +71,70 @@ h2 {
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
+    font-size: 14px;
 }
 
 #flight-table th, #flight-table td {
-    padding: 10px;
-    border: 1px solid #ddd;
+    padding: 12px; /* Increased padding */
+    border: 1px solid #666; /* Darker border */
     text-align: left;
+    vertical-align: top; /* Align text to the top */
 }
 
 #flight-table th {
-    background-color: #f0f0f0;
+    background-color: #444; /* Darker header background */
+    color: #fff;
 }
 
 #flight-table tbody tr:nth-child(odd) {
-    background-color: #fff;
+    background-color: #333; /* Darker row background */
+    color: #eee;
 }
 
 #flight-table tbody tr:nth-child(even) {
-    background-color: #f5f5f5;
+    background-color: #444; /* Even darker row background */
+    color: #eee;
 }
 
+#flight-table tbody tr:hover {
+    background-color: #555; /* Slightly lighter on hover */
+    color: #fff;
+}
+
+
 #weather-info, #catastrophe-info {
-    padding: 10px;
-    border: 1px solid #ddd;
+    padding: 15px;
+    border: 1px solid #444;
     border-radius: 8px;
-    background-color: #fff;
+    background-color: #333;
+    color: #eee;
+    line-height: 1.5; /* Improved line height for readability */
+}
+
+#weather-info p, #catastrophe-info p{
+    margin-bottom: 10px;
 }
 
 #airport-map {
     max-width: 100%;
     height: auto;
-    border: 1px solid #ddd;
+    border: 1px solid #444;
     border-radius: 8px;
+    background-color: #222;
 }
 
 footer {
     text-align: center;
-    padding: 10px 0;
-    border-top: 1px solid #ddd;
+    padding: 15px 0;
+    border-top: 1px solid #555;
     margin-top: 20px;
+    color: #bbb;
 }
 
 .loading {
     text-align: center;
     font-style: italic;
-    color: #888;
+    color: #aaa;
 }
 
 #controls-section {
@@ -123,17 +144,26 @@ footer {
 }
 
 #refresh-button {
-    padding: 10px 20px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
+    padding: 12px 25px;
+    background-color: green; /* Darker purple */
+    color: #fff;
+    border: 2px solid #fff; /* Purple border */
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 18px;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 #refresh-button:hover {
-    background-color: #367c39;
+    background-color: rgb(3, 155, 3); /* Lighter purple on hover */
+    color: #000;
+    border-color: #a7f9a7;
+}
+
+#refresh-button:active{
+    background-color: green;
+    color: #000;
+    border-color: #000;
 }
 
 /* Responsive adjustments */
@@ -142,19 +172,19 @@ footer {
         padding: 10px;
     }
     #flight-table th, #flight-table td {
-        padding: 8px;
+        padding: 10px;
     }
     h1 {
-        font-size: 20px;
+        font-size: 24px;
     }
     h2 {
-        font-size: 18px;
+        font-size: 20px;
     }
     main {
         flex-direction: column;
     }
     section {
-        padding: 10px;
+        padding: 15px;
     }
     #flight-table-container {
         overflow-x: auto;
