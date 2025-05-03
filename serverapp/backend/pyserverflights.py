@@ -3,7 +3,8 @@ from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from generator import generate_flight_data
-import time
+from sqlalchemy import text
+from addweather import fetch_weather_data
 
 app = Flask(__name__)
 
@@ -23,10 +24,32 @@ class FlightData(Base):
     departure_time = Column(String)
     status = Column(String)
 
+class WeatherData(Base):
+    __tablename__ = 'weather'
+    id = Column(Integer, primary_key=True)
+    temperature = Column(Integer)
+    humidity = Column(Integer)
+    condition = Column(String)
+
 # Define routes
 
-@app.route('/data', methods=['GET'])
-def get_data():
+@app.route('/weather', methods=['GET'])
+def get_dataweather():
+    # Fetch all weather data from the database
+    data = session.query(WeatherData).all()
+    
+    # Constructing a matrix (list of lists) from the fetched data
+    weather_matrix = [
+        [item.temperature, item.humidity, item.condition]
+        for item in data
+    ]
+    
+    return jsonify(weather_matrix)
+
+
+
+@app.route('/flights', methods=['GET'])
+def get_dataflights():
     # Fetch all flight data from the database
     data = session.query(FlightData).all()
     
@@ -38,8 +61,22 @@ def get_data():
     
     return jsonify(flights_matrix)
 
-@app.route('/data', methods=['POST'])
-def add_data():
+@app.route('/del-weather', methods=['POST'])
+def del_dataweather() :
+    session.execute(text('DELETE FROM weather'))
+    session.commit()
+    print("All entries from the weather table have been deleted.")
+    return jsonify({"message": "All entries from the weather table have been deleted."})
+
+@app.route('/del-flights', methods=['POST'])
+def del_dataflights():
+    session.execute(text('DELETE FROM flights'))
+    session.commit()
+    print("All entries from the flights table have been deleted.")
+    return jsonify({"message": "All entries from the flights table have been deleted."})
+
+@app.route('/add-flights', methods=['POST'])
+def add_dataflights():
             
     new_data = generate_flight_data()
     new_entry = FlightData(
@@ -53,6 +90,11 @@ def add_data():
     session.add(new_entry)
     session.commit()
     return jsonify({"message": "Flight data added successfully!"})
+
+@app.route('/add-weather', methods=['POST'])
+def add_dataweather():
+    fetch_weather_data()  # Assuming this fetches and adds weather data
+    return jsonify({"message": "Weather data added successfully!"})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
