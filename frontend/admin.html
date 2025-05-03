@@ -36,7 +36,7 @@
         }
 
         .flight-form input {
-            flex: 1 1 calc(20% - 10px); /* Each input takes 20% of the row with spacing */
+            flex: 1 1 calc(16% - 10px); /* Each input takes 20% of the row with spacing */
             min-width: 120px;
             padding: 10px;
             box-sizing: border-box;
@@ -129,6 +129,7 @@
         <form class="flight-form" id="flightForm">
             <input type="text" id="flightNumber" placeholder="Flight Number" required>
             <input type="text" id="gate" placeholder="Gate" required>
+            <input type="text" id="destination" placeholder="Destination" required>
             <input type="text" id="boardingTime" placeholder="Boarding Time" required>
             <input type="text" id="departureTime" placeholder="Departure Time" required>
             <input type="text" id="status" placeholder="Status" required>
@@ -139,6 +140,7 @@
                 <tr>
                     <th>Flight Number</th>
                     <th>Gate</th>
+                    <th>Destination</th>
                     <th>Boarding Time</th>
                     <th>Departure Time</th>
                     <th>Status</th>
@@ -159,23 +161,25 @@
             event.preventDefault();
             const flightNumber = document.getElementById('flightNumber').value.trim();
             const gate = document.getElementById('gate').value.trim();
+            const destination = document.getElementById('destination').value.trim();
             const boardingTime = document.getElementById('boardingTime').value.trim();
             const departureTime = document.getElementById('departureTime').value.trim();
             const status = document.getElementById('status').value.trim();
 
-            if (flightNumber && gate && boardingTime && departureTime && status) {
-                addFlightRow(flightNumber, gate, boardingTime, departureTime, status);
+            if (flightNumber && gate && destination && boardingTime && departureTime && status) {
+                addFlightRow(flightNumber, gate, destination, boardingTime, departureTime, status);
                 flightForm.reset(); // Clear the form
             }
         });
 
         // Function to add a flight row to the table
-        function addFlightRow(flightNumber, gate, boardingTime, departureTime, status) {
+        function addFlightRow(flightNumber, gate, destination, boardingTime, departureTime, status) {
             const row = document.createElement('tr');
 
             row.innerHTML = `
                 <td>${flightNumber}</td>
                 <td>${gate}</td>
+                <td>${destination}</td>
                 <td>${boardingTime}</td>
                 <td>${departureTime}</td>
                 <td>${status}</td>
@@ -191,7 +195,7 @@
         function editRow(button) {
             const row = button.parentElement.parentElement;
             const cells = row.querySelectorAll('td');
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < 6; i++) {
                 const currentValue = cells[i].textContent;
                 cells[i].innerHTML = `<input type="text" value="${currentValue}" style="width: 80%; padding: 5px; font-size: 12px;" />`;
             }
@@ -205,7 +209,7 @@
         function saveRow(button) {
             const row = button.parentElement.parentElement;
             const cells = row.querySelectorAll('td');
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < 6; i++) {
                 const input = cells[i].querySelector('input');
                 cells[i].textContent = input.value;
             }

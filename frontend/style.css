@@ -70,18 +70,18 @@ h2 {
     transition: color 0.5s ease; /* Smooth transition */
 }
 
-#flight-table-container {
+#flight-table-container, #weather-info {
     overflow-x: auto;
 }
 
-#flight-table {
+#flight-table, #weather-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
     font-size: 14px;
 }
 
-#flight-table th, #flight-table td {
+#flight-table th, #flight-table td, #weather-info th, #weather-info td {
     padding: 12px;
     border: 1px solid #ddd; /* Lighter border for normal */
     text-align: left;
@@ -89,42 +89,28 @@ h2 {
     transition: border-color 0.5s ease; /* Smooth transition */
 }
 
-#flight-table th {
+#flight-table th, #weather-info th {
     background-color: #f0f0f0; /* Lighter header for normal */
     color: #111; /* Dark text for normal */
     transition: background-color 0.5s ease, color 0.5s ease; /* Smooth transition */
 }
 
-#flight-table tbody tr:nth-child(odd) {
+#flight-table tbody tr:nth-child(odd), #weather-info tbody tr:nth-child(odd) {
     background-color: #fff; /* Lighter row for normal */
     color: #111; /* Dark text for normal */
     transition: background-color 0.5s ease, color 0.5s ease; /* Smooth transition */
 }
 
-#flight-table tbody tr:nth-child(even) {
+#flight-table tbody tr:nth-child(even), #weather-info tbody tr:nth-child(even) {
     background-color: #f5f5f5; /* Slightly lighter row for normal */
     color: #111; /* Dark text for normal */
     transition: background-color 0.5s ease, color 0.5s ease;
 }
 
-#flight-table tbody tr:hover {
+#flight-table tbody tr:hover, #weather-info tbody tr:hover {
     background-color: #e0e0e0; /* Slightly darker hover for normal */
     color: #111;
     transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-#weather-info, #catastrophe-info {
-    padding: 15px;
-    border: 1px solid #ddd; /* Lighter border for normal */
-    border-radius: 8px;
-    background-color: #fff; /* Lighter background for normal */
-    color: #111; /* Dark text for normal */
-    line-height: 1.5;
-    transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease;
-}
-
-#weather-info p, #catastrophe-info p {
-    margin-bottom: 10px;
 }
 
 #airport-map {

@@ -8,30 +8,61 @@ let isBlackout = false;
 
 // Update weather data
 async function fetchWeather() {
+  try {
+    const response = await fetch('http://10.192.136.63:5000/weather');
+    if (!response.ok) throw new Error("Network response was not ok");
 
+    const flights = await response.json();
+    const tbody = weatherInfo.querySelector('tbody');
+    tbody.innerHTML = '';
+
+    flights.forEach(fl => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${fl[0]}</td>
+        <td>${fl[1]}</td>
+        <td>${fl[2]}</td>
+      `;
+      tbody.appendChild(row);
+      console.log(fl[0]);
+    });
+  } catch (error) {
+    console.error("Failed to fetch flight data:", error);
+  }
 }
 
 // Update flight data
 async function fetchData() {
     try {
-      const response = await fetch('http://<ESP32_IP_ADDRESS>/flights');
+      const response = await fetch('http://10.192.136.63:5000/flights');
       if (!response.ok) throw new Error("Network response was not ok");
   
       const flights = await response.json();
       const tbody = flightTable.querySelector('tbody');
-      tbody.innerHTML = ''; // Clear existing rows
+      tbody.innerHTML = '';
+
+      // Get the query string from the current URL
+      const queryString = window.location.search;
+
+      // Parse the query string
+      const urlParams = new URLSearchParams(queryString);
+
+      // Get the value of 'flightNumber'
+      const flightNumber = urlParams.get('flightNumber');
   
-      flights.forEach(flight => {
+      flights.forEach(fl => {
+        if (!(flightNumber === null) && fl[0] != flightNumber) return; // Skip if flight number doesn't match
         const row = document.createElement('tr');
         row.innerHTML = `
-          <td>${flight.flightNumber}</td>
-          <td>${flight.gate}</td>
-          <td>${flight.destination}</td>
-          <td>${flight.boarding}</td>
-          <td>${flight.departure}</td>
-          <td>${flight.status}</td>
+          <td>${fl[0]}</td>
+          <td>${fl[1]}</td>
+          <td>${fl[2]}</td>
+          <td>${fl[3]}</td>
+          <td>${fl[4]}</td>
+          <td>${fl[5]}</td>
         `;
         tbody.appendChild(row);
+        console.log(fl[0]);
       });
     } catch (error) {
       console.error("Failed to fetch flight data:", error);
@@ -64,6 +95,7 @@ function updateBlackoutStatusDisplay() {
 // Initial data load when the page loads
 window.onload = () => {
     fetchData();
+    fetchWeather();
     updateBlackoutStatusDisplay();
     // Add a button to simulate a blackout (for testing purposes)
     const blackoutButton = document.createElement('button');
@@ -76,5 +108,6 @@ window.onload = () => {
 // Refresh data when the refresh button is clicked
 refreshButton.addEventListener('click', () => {
     fetchData();
+    fetchWeather();
     updateBlackoutStatusDisplay();
 });
