@@ -139,10 +139,13 @@ function simulateBlackout() {
 
 // Function to update the blackout status display
 function updateBlackoutStatusDisplay() {
+    const styleSheet = document.getElementById('theme-stylesheet');
     if (isBlackout) {
+        styleSheet.href = "blackout.css";
         blackoutStatusElement.textContent = "Operating in Blackout Mode. Data may be outdated.";
         blackoutStatusElement.style.color = "red";
     } else {
+        styleSheet.href = "style.css";
         blackoutStatusElement.textContent = "Operating Normally";
         blackoutStatusElement.style.color = "green";
     }
