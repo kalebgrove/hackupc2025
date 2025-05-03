@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
-from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy import create_engine, Column, Integer, String, REAL
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 from generator import generate_flight_data
 from sqlalchemy import text
 from addweather import fetch_weather_data
@@ -10,9 +10,10 @@ app = Flask(__name__)
 
 # Setup SQLAlchemy with the existing flights.db
 Base = declarative_base()
-engine = create_engine('sqlite:///flights.db')
-Session = sessionmaker(bind=engine)
-session = Session()
+engine = create_engine('sqlite:///info.db', connect_args={"check_same_thread": False})
+SessionFactory = sessionmaker(bind=engine)
+
+session = scoped_session(SessionFactory)
 
 # Assuming the database has a table for storing flight information, adjust as necessary
 class FlightData(Base):
@@ -26,8 +27,8 @@ class FlightData(Base):
 
 class WeatherData(Base):
     __tablename__ = 'weather'
-    id = Column(Integer, primary_key=True)
-    temperature = Column(Integer)
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    temperature = Column(REAL)
     humidity = Column(Integer)
     condition = Column(String)
 
@@ -45,8 +46,6 @@ def get_dataweather():
     ]
     
     return jsonify(weather_matrix)
-
-
 
 @app.route('/flights', methods=['GET'])
 def get_dataflights():
@@ -93,7 +92,15 @@ def add_dataflights():
 
 @app.route('/add-weather', methods=['POST'])
 def add_dataweather():
-    fetch_weather_data()  # Assuming this fetches and adds weather data
+    new_data = fetch_weather_data()  # Assuming this fetches and adds weather data
+    new_entry = WeatherData(
+        temperature=new_data['temperature'],
+        humidity=new_data['humidity'],
+        condition=new_data['condition']
+    )
+    session.add(new_entry)
+    session.commit()
+
     return jsonify({"message": "Weather data added successfully!"})
 
 if __name__ == '__main__':
