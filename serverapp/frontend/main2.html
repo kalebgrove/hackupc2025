@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Information</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Flight Information</h1>
+
+<!-- Button to load all flights -->
+<button onclick="loadAllFlights()">Load All Flights</button>
+
+<!-- Table to display flight information -->
+<table id="flightsTable">
+    <thead>
+        <tr>
+            <th>Flight Number</th>
+            <th>Gate</th>
+            <th>Boarding Time</th>
+            <th>Departure Time</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Flight data will go here -->
+    </tbody>
+</table>
+
+<!-- Input and button to search by flight number -->
+<h2>Search by Flight Number</h2>
+<input type="text" id="flightNumber" placeholder="Enter flight number">
+<button onclick="loadFlightByNumber()">Search</button>
+
+<script>
+// URL of your PHP server
+const serverUrl = 'http://localhost:8080';  // Change to your server URL
+
+// Function to load all flights from the server
+function loadAllFlights() {
+    fetch(serverUrl + '/flights')
+        .then(response => response.json())
+        .then(flights => {
+            const tableBody = document.querySelector('#flightsTable tbody');
+            tableBody.innerHTML = '';  // Clear any existing rows
+            flights.forEach(flight => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${flight.flightnumber}</td>
+                    <td>${flight.gate}</td>
+                    <td>${flight.boarding_time}</td>
+                    <td>${flight.departure_time}</td>
+                    <td>${flight.status}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        })
+        .catch(error => console.error('Error fetching flights:', error));
+}
+
+// Function to load a specific flight by flight number
+function loadFlightByNumber() {
+    const flightNumber = document.getElementById('flightNumber').value;
+    if (!flightNumber) {
+        alert('Please enter a flight number');
+        return;
+    }
+
+    fetch(serverUrl + '/flight/' + flightNumber)
+        .then(response => response.json())
+        .then(flight => {
+            const tableBody = document.querySelector('#flightsTable tbody');
+            tableBody.innerHTML = '';  // Clear any existing rows
+            if (flight.error) {
+                alert('Flight not found');
+            } else {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${flight.flightnumber}</td>
+                    <td>${flight.gate}</td>
+                    <td>${flight.boarding_time}</td>
+                    <td>${flight.departure_time}</td>
+                    <td>${flight.status}</td>
+                `;
+                tableBody.appendChild(row);
+            }
+        })
+        .catch(error => console.error('Error fetching flight:', error));
+}
+</script>
+
+</body>
+</html>

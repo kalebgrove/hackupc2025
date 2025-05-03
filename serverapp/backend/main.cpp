@@ -238,28 +238,39 @@ void insertInitialData() {
 }
 
 // Function to retrieve flight data from the database
-String getFlightData(string flightnum) {
+String getFlightData(String flightnum) {
   String json = "[";
   sqlite3_stmt* stmt;
   const char* query = "SELECT flight_number, flight_gate, boarding_time, departure_time, status FROM flights WHERE flight_number = ?";
-  int rc = sqlite3_prepare_v2(db, query, [flightnum], -1, &stmt, NULL);
+  int rc;
+
+  rc = sqlite3_prepare_v2(db, query, -1, &stmt, NULL); // Corrected prepare.  flightnum will be bound later.
   if (rc != SQLITE_OK) {
-    Serial.println("Error preparing flight query: " + String(sqlite3_errmsg(db)));
-    return "[]"; // Return empty JSON array on error
+      Serial.println("Error preparing flight query: " + String(sqlite3_errmsg(db)));
+      return "[]"; // Return empty JSON array on error
   }
 
-  while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
-    json += "{";
-    json += "\"flight_number\":" + String(sqlite3_column_int(stmt, 0)) + ",";
-    json += "\"flight_gate\":\"" + String((const char*)sqlite3_column_text(stmt, 1)) + "\",";
-    json += "\"boarding_time\":\"" + String((const char*)sqlite3_column_text(stmt, 2)) + "\",";
-    json += "\"departure_time\":\"" + String((const char*)sqlite3_column_text(stmt, 3)) + "\",";
-    json += "\"status\":\"" + String((const char*)sqlite3_column_text(stmt, 4)) + "\"";
-    json += "},";
+  // Bind the flight number parameter.  This is the correct way in C++
+  rc = sqlite3_bind_text(stmt, 1, flightnum.c_str(), -1, SQLITE_STATIC);
+  if (rc != SQLITE_OK) {
+      Serial.println("Error binding parameter: " + String(sqlite3_errmsg(db)));
+      sqlite3_finalize(stmt); // Clean up prepared statement
+      return "[]";
   }
-  sqlite3_finalize(stmt);
+
+
+  while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+      json += "{";
+      json += "\"flight_number\":\"" + String(sqlite3_column_text(stmt, 0)) + "\","; //flight_number is a text in database
+      json += "\"flight_gate\":\"" + String((const char*)sqlite3_column_text(stmt, 1)) + "\",";
+      json += "\"boarding_time\":\"" + String((const char*)sqlite3_column_text(stmt, 2)) + "\",";
+      json += "\"departure_time\":\"" + String((const char*)sqlite3_column_text(stmt, 3)) + "\",";
+      json += "\"status\":\"" + String((const char*)sqlite3_column_text(stmt, 4)) + "\"";
+      json += "},";
+  }
+  sqlite3_finalize(stmt); //moved to ensure it always fires
   if (json.length() > 1) {
-    json.remove(json.length() - 1); // Remove trailing comma, if any
+      json.remove(json.length() - 1); // Remove trailing comma, if any
   }
   json += "]";
   return json;
@@ -269,7 +280,7 @@ String getFlightData(string flightnum) {
 String getWeatherData() {
   String json = "[";
   sqlite3_stmt* stmt;
-  const char* query = "SELECT conditions, temperature, humidity FROM weather";
+  const char* query = "SELECT conditions, temperature FROM weather";
   int rc = sqlite3_prepare_v2(db, query, -1, &stmt, NULL);
   if (rc != SQLITE_OK) {
     Serial.println("Error preparing weather query: " + String(sqlite3_errmsg(db)));

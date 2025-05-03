@@ -110,7 +110,7 @@ function fetchData() {
         //fetch local data
         loadingIndicator.style.display = 'block';
         Promise.all([
-            fetch('/flights').then(response => response.json()),
+            fetch('http://localhost:8080/flights').then(response => response.json()),
             fetch('/weather').then(response => response.json()),
             fetch('/catastrophes').then(response => response.json())
         ])
