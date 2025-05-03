@@ -2,7 +2,8 @@ from flask import Flask, request, jsonify
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-import requests
+from generator import generate_flight_data
+import time
 
 app = Flask(__name__)
 
@@ -39,7 +40,8 @@ def get_data():
 
 @app.route('/data', methods=['POST'])
 def add_data():
-    new_data = request.json
+            
+    new_data = generate_flight_data()
     new_entry = FlightData(
         flightnumber=new_data['flightnumber'],
         gate=new_data['gate'],
@@ -51,21 +53,6 @@ def add_data():
     session.add(new_entry)
     session.commit()
     return jsonify({"message": "Flight data added successfully!"})
-
-# @app.route('/fetch-external-api', methods=['GET'])
-# def fetch_external_api():
-#     # Example external API to fetch flight data (replace with your actual API)
-#     response = requests.get('https://api.example.com/flights')
-#     external_data = response.json()
-#     for item in external_data:
-#         new_entry = FlightData(
-#             flight_code=item['flight_code'],
-#             destination=item['destination'],
-#             departure_time=item['departure_time']
-#         )
-#         session.add(new_entry)
-#     session.commit()
-#     return jsonify({"message": "External flight data fetched and added successfully!"})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
