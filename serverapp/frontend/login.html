@@ -15,15 +15,30 @@
             min-height: 100vh;
             margin: 0 auto;
         }
+
+        /* Style each row */
+        .row {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        /* Style the button */
+        button {
+            padding: 5px 10px; /* Reduced padding */
+            font-size: 14px;  /* Smaller font size */
+        }
     </style>
 </head>
 <body>
     <div class="container login-container">
         <h2>Airport Information Login</h2>
         <form id="loginForm" action="main.html" method="GET">
-            <label for="flightNumber">Flight Number</label>
-            <input type="text" id="flightNumber" name="flightNumber" placeholder="Enter your flight number" required>
-            <button type="submit">Login</button>
+            <div class="row">
+                <input type="text" id="flightNumber" name="flightNumber" placeholder="Enter your flight number" required>
+            </div>
+            <div class="row">
+                <button type="submit">Login</button>
+            </div>
         </form>
     </div>
 </body>
