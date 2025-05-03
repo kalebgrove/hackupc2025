@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Administrator Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="blackout.css">
+    <style>
+        /* General container styling */
+        .admin-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            min-height: 100vh;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: green;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Form styling */
+        .flight-form {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .flight-form input {
+            flex: 1 1 calc(20% - 10px); /* Each input takes 20% of the row with spacing */
+            min-width: 120px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .flight-form button {
+            flex: 1 1 100%; /* Button takes full width */
+            max-width: 200px;
+            padding: 10px;
+            background-color: green;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .flight-form button:hover {
+            background-color: rgb(3, 155, 3);
+        }
+
+        /* Table styling */
+        .flight-table {
+            width: 100%;
+            max-width: 800px;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .flight-table th, .flight-table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+            word-wrap: break-word;
+        }
+
+        .flight-table th {
+            background-color: #000;
+        }
+
+        .action-buttons button {
+            margin: 0 5px;
+            padding: 5px 10px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .flight-form input {
+                flex: 1 1 100%; /* Inputs stack vertically on smaller screens */
+                min-width: 100%;
+            }
+
+            .flight-form button {
+                flex: 1 1 100%; /* Button also stacks */
+            }
+
+            .flight-table {
+                font-size: 14px; /* Reduce font size for smaller screens */
+            }
+
+            .flight-table th, .flight-table td {
+                padding: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 18px; /* Smaller font size for the title */
+            }
+
+            .flight-form input {
+                padding: 8px; /* Reduce padding for inputs */
+            }
+
+            .flight-form button {
+                padding: 8px; /* Reduce padding for button */
+            }
+
+            .flight-table th, .flight-table td {
+                font-size: 12px; /* Further reduce font size */
+                padding: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container admin-container">
+        <h1>Administrator Dashboard</h1>
+        <form class="flight-form" id="flightForm">
+            <input type="text" id="flightNumber" placeholder="Flight Number" required>
+            <input type="text" id="gate" placeholder="Gate" required>
+            <input type="text" id="boardingTime" placeholder="Boarding Time" required>
+            <input type="text" id="departureTime" placeholder="Departure Time" required>
+            <input type="text" id="status" placeholder="Status" required>
+            <button type="submit">Add Flight</button>
+        </form>
+        <table class="flight-table" id="flightTable">
+            <thead>
+                <tr>
+                    <th>Flight Number</th>
+                    <th>Gate</th>
+                    <th>Boarding Time</th>
+                    <th>Departure Time</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Flight rows will be dynamically added here -->
+            </tbody>
+        </table>
+    </div>
+    <script>
+        const flightForm = document.getElementById('flightForm');
+        const flightTable = document.getElementById('flightTable').querySelector('tbody');
+
+        // Add flight information
+        flightForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const flightNumber = document.getElementById('flightNumber').value.trim();
+            const gate = document.getElementById('gate').value.trim();
+            const boardingTime = document.getElementById('boardingTime').value.trim();
+            const departureTime = document.getElementById('departureTime').value.trim();
+            const status = document.getElementById('status').value.trim();
+
+            if (flightNumber && gate && boardingTime && departureTime && status) {
+                addFlightRow(flightNumber, gate, boardingTime, departureTime, status);
+                flightForm.reset(); // Clear the form
+            }
+        });
+
+        // Function to add a flight row to the table
+        function addFlightRow(flightNumber, gate, boardingTime, departureTime, status) {
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td>${flightNumber}</td>
+                <td>${gate}</td>
+                <td>${boardingTime}</td>
+                <td>${departureTime}</td>
+                <td>${status}</td>
+                <td class="action-buttons">
+                    <button onclick="editRow(this)">Edit</button>
+                    <button onclick="deleteRow(this)">Delete</button>
+                </td>
+            `;
+
+            flightTable.appendChild(row);
+        }
+
+        function editRow(button) {
+            const row = button.parentElement.parentElement;
+            const cells = row.querySelectorAll('td');
+            for (let i = 0; i < 5; i++) {
+                const currentValue = cells[i].textContent;
+                cells[i].innerHTML = `<input type="text" value="${currentValue}" style="width: 80%; padding: 5px; font-size: 12px;" />`;
+            }
+            button.textContent = 'Save';
+            button.onclick = function() {
+                saveRow(button);
+            };
+        }
+
+        // Function to save a flight row after editing
+        function saveRow(button) {
+            const row = button.parentElement.parentElement;
+            const cells = row.querySelectorAll('td');
+            for (let i = 0; i < 5; i++) {
+                const input = cells[i].querySelector('input');
+                cells[i].textContent = input.value;
+            }
+            button.textContent = 'Edit';
+            button.onclick = function() {
+                editRow(button);
+            };
+        }
+
+        // Function to delete a flight row
+        function deleteRow(button) {
+            const row = button.parentElement.parentElement;
+            flightTable.removeChild(row);
+        }
+    </script>
+</body>
+</html>

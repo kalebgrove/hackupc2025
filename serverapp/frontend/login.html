@@ -41,5 +41,16 @@
             </div>
         </form>
     </div>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+            const flightNumber = document.getElementById('flightNumber').value.trim();
+            if (flightNumber === 'superuser') {
+                window.location.href = `admin.html`; // Redirect to admin page with query parameter
+            } else {
+                window.location.href = `main.html?flightNumber=${encodeURIComponent(flightNumber)}`; // Redirect to user dashboard with query parameter
+            }
+        });
+    </script>
 </body>
 </html>
