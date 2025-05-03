@@ -238,11 +238,11 @@ void insertInitialData() {
 }
 
 // Function to retrieve flight data from the database
-String getFlightData() {
+String getFlightData(string flightnum) {
   String json = "[";
   sqlite3_stmt* stmt;
-  const char* query = "SELECT flight_number, flight_gate, boarding_time, departure_time, status FROM flights";
-  int rc = sqlite3_prepare_v2(db, query, -1, &stmt, NULL);
+  const char* query = "SELECT flight_number, flight_gate, boarding_time, departure_time, status FROM flights WHERE flight_number = ?";
+  int rc = sqlite3_prepare_v2(db, query, [flightnum], -1, &stmt, NULL);
   if (rc != SQLITE_OK) {
     Serial.println("Error preparing flight query: " + String(sqlite3_errmsg(db)));
     return "[]"; // Return empty JSON array on error
