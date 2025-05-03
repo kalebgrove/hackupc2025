@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Airport Information System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="blackout.css">
+    <style>
+        /* Center the login-container div */
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container login-container">
+        <h2>Airport Information Login</h2>
+        <form id="loginForm" action="main.html" method="GET">
+            <label for="flightNumber">Flight Number</label>
+            <input type="text" id="flightNumber" name="flightNumber" placeholder="Enter your flight number" required>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+</body>
+</html>
