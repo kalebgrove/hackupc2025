@@ -135,7 +135,7 @@
             <input type="text" id="status" placeholder="Status" required>
             <button type="submit">Add Flight</button>
         </form>
-        <table class="flight-table" id="flightTable">
+        <table class="flight-table" id="flightTableAdmin">
             <thead>
                 <tr>
                     <th>Flight Number</th>
@@ -152,78 +152,6 @@
             </tbody>
         </table>
     </div>
-    <script>
-        const flightForm = document.getElementById('flightForm');
-        const flightTable = document.getElementById('flightTable').querySelector('tbody');
-
-        // Add flight information
-        flightForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-            const flightNumber = document.getElementById('flightNumber').value.trim();
-            const gate = document.getElementById('gate').value.trim();
-            const destination = document.getElementById('destination').value.trim();
-            const boardingTime = document.getElementById('boardingTime').value.trim();
-            const departureTime = document.getElementById('departureTime').value.trim();
-            const status = document.getElementById('status').value.trim();
-
-            if (flightNumber && gate && destination && boardingTime && departureTime && status) {
-                addFlightRow(flightNumber, gate, destination, boardingTime, departureTime, status);
-                flightForm.reset(); // Clear the form
-            }
-        });
-
-        // Function to add a flight row to the table
-        function addFlightRow(flightNumber, gate, destination, boardingTime, departureTime, status) {
-            const row = document.createElement('tr');
-
-            row.innerHTML = `
-                <td>${flightNumber}</td>
-                <td>${gate}</td>
-                <td>${destination}</td>
-                <td>${boardingTime}</td>
-                <td>${departureTime}</td>
-                <td>${status}</td>
-                <td class="action-buttons">
-                    <button onclick="editRow(this)">Edit</button>
-                    <button onclick="deleteRow(this)">Delete</button>
-                </td>
-            `;
-
-            flightTable.appendChild(row);
-        }
-
-        function editRow(button) {
-            const row = button.parentElement.parentElement;
-            const cells = row.querySelectorAll('td');
-            for (let i = 0; i < 6; i++) {
-                const currentValue = cells[i].textContent;
-                cells[i].innerHTML = `<input type="text" value="${currentValue}" style="width: 80%; padding: 5px; font-size: 12px;" />`;
-            }
-            button.textContent = 'Save';
-            button.onclick = function() {
-                saveRow(button);
-            };
-        }
-
-        // Function to save a flight row after editing
-        function saveRow(button) {
-            const row = button.parentElement.parentElement;
-            const cells = row.querySelectorAll('td');
-            for (let i = 0; i < 6; i++) {
-                const input = cells[i].querySelector('input');
-                cells[i].textContent = input.value;
-            }
-            button.textContent = 'Edit';
-            button.onclick = function() {
-                editRow(button);
-            };
-        }
-
-        // Function to delete a flight row
-        function deleteRow(button) {
-            const row = button.parentElement.parentElement;
-            flightTable.removeChild(row);
-        }
-    </script>
+    <script src="adminscript.js"></script>
 </body>
 </html>

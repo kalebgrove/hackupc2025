@@ -1,4 +1,5 @@
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify, request
+from flask_cors import CORS
 from sqlalchemy import create_engine, Column, Integer, String, REAL
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session
@@ -7,6 +8,7 @@ from sqlalchemy import text
 from addweather import fetch_weather_data
 
 app = Flask(__name__)
+CORS(app)
 
 # Setup SQLAlchemy with the existing flights.db
 Base = declarative_base()
@@ -47,6 +49,38 @@ def get_dataweather():
     
     return jsonify(weather_matrix)
 
+@app.route('/flights/<flightnumber>', methods=['PUT'])
+def update_flight(flightnumber):
+    """
+    Updates an existing flight in the database.
+    """
+    db_session = session()
+    try:
+        # Get the updated flight data from the request's JSON body
+        new_data = request.get_json()
+
+        # Find the flight in the database by flightnumber (primary key)
+        flight_to_update = db_session.query(FlightData).filter_by(flightnumber=flightnumber).first()
+
+        if flight_to_update:
+            # Update the flight's attributes with the new data
+            flight_to_update.gate = new_data.get('gate', flight_to_update.gate)
+            flight_to_update.destination = new_data.get('destination', flight_to_update.destination)
+            flight_to_update.boarding_time = new_data.get('boarding_time', flight_to_update.boarding_time)
+            flight_to_update.departure_time = new_data.get('departure_time', flight_to_update.departure_time)
+            flight_to_update.status = new_data.get('status', flight_to_update.status)
+
+            db_session.commit()
+            return jsonify({"message": "Flight data updated successfully!"})
+        else:
+            return jsonify({"error": "Flight not found"}), 404  # Return 404 if not found
+
+    except Exception as e:
+        db_session.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        db_session.close()
+
 @app.route('/flights', methods=['GET'])
 def get_dataflights():
     # Fetch all flight data from the database
@@ -73,6 +107,32 @@ def del_dataflights():
     session.commit()
     print("All entries from the flights table have been deleted.")
     return jsonify({"message": "All entries from the flights table have been deleted."})
+
+@app.route('/add-flight-admin', methods=['POST'])
+def add_flight_admin():
+    db_session = session()
+
+    try:
+        new_data = request.get_json()
+
+        new_flight = FlightData(
+            flightnumber=new_data.get('flightnumber'),  # Use .get() to handle missing fields
+            gate=new_data.get('gate'),
+            destination=new_data.get('destination'),
+            boarding_time=new_data.get('boarding_time'),
+            departure_time=new_data.get('departure_time'),
+            status=new_data.get('status')
+        )
+
+        db_session.add(new_flight)
+
+        db_session.commit()
+
+    except Exception as e:
+        db_session.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        db_session.close() 
 
 @app.route('/add-flights', methods=['POST'])
 def add_dataflights():

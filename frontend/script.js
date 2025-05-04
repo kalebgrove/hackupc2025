@@ -9,7 +9,8 @@ let isBlackout = false;
 // Update weather data
 async function fetchWeather() {
   try {
-    const response = await fetch('http://10.192.136.63:5000/weather');
+    let found = false;
+    const response = await fetch('http://<esp>/weather');
     if (!response.ok) throw new Error("Network response was not ok");
 
     const flights = await response.json();
@@ -17,6 +18,7 @@ async function fetchWeather() {
     tbody.innerHTML = '';
 
     flights.forEach(fl => {
+      if(fl[0] != null) found = true;
       const row = document.createElement('tr');
       row.innerHTML = `
         <td>${fl[0]}</td>
@@ -24,8 +26,13 @@ async function fetchWeather() {
         <td>${fl[2]}</td>
       `;
       tbody.appendChild(row);
-      console.log(fl[0]);
     });
+
+    if(!found) {
+      const row = document.createElement('tr');
+      row.innerHTML = `<td colspan="3">No weather data found.</td>`;
+      tbody.appendChild(row);
+    }
   } catch (error) {
     console.error("Failed to fetch flight data:", error);
   }
@@ -34,7 +41,8 @@ async function fetchWeather() {
 // Update flight data
 async function fetchData() {
     try {
-      const response = await fetch('http://10.192.136.63:5000/flights');
+      let found = false;
+      const response = await fetch('http://<esp>/flights');
       if (!response.ok) throw new Error("Network response was not ok");
   
       const flights = await response.json();
@@ -53,6 +61,7 @@ async function fetchData() {
       flights.forEach(fl => {
         if (!(flightNumber === null) && fl[0] != flightNumber) return; // Skip if flight number doesn't match
         const row = document.createElement('tr');
+        found = true;
         row.innerHTML = `
           <td>${fl[0]}</td>
           <td>${fl[1]}</td>
@@ -62,8 +71,13 @@ async function fetchData() {
           <td>${fl[5]}</td>
         `;
         tbody.appendChild(row);
-        console.log(fl[0]);
       });
+
+      if(!found) {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td colspan="6">No flight data</td>`;
+        tbody.appendChild(row);
+      }
     } catch (error) {
       console.error("Failed to fetch flight data:", error);
     }
@@ -96,6 +110,7 @@ function updateBlackoutStatusDisplay() {
 window.onload = () => {
     fetchData();
     fetchWeather();
+    //fetchDataAdmin();
     updateBlackoutStatusDisplay();
     // Add a button to simulate a blackout (for testing purposes)
     const blackoutButton = document.createElement('button');

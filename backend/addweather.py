@@ -1,6 +1,4 @@
 import requests
-import sqlite3
-from datetime import datetime
 from config import API
 
 # Your WeatherAPI API key (replace with your actual API key)
@@ -20,6 +18,8 @@ def fetch_weather_data():
 
     if response.status_code == 200:
         data = response.json()
+
+        print(data)
 
         # Extracting relevant data from the API response
         temperature = data['current']['temp_c']  # Temperature in Celsius
