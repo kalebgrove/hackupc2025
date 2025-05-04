@@ -81,43 +81,72 @@ void handleAdmin() {
     server.sendHeader("Location", "/admin");
     server.send(303);
   } else {
-    String page = "<h2>Add New Flight</h2><form method='POST' style='display: flex; flex-direction: column;'>";
-    page += "Flight Number: <input name='flightNumber' style='margin: 5px; padding: 10px; font-size: 16px;' required><br>";
-    page += "Gate: <input name='gate' style='margin: 5px; padding: 10px; font-size: 16px;' required><br>";
-    page += "Destination: <input name='destination' style='margin: 5px; padding: 10px; font-size: 16px;' required><br>";
-    page += "Boarding: <input name='boarding' style='margin: 5px; padding: 10px; font-size: 16px;' required><br>";
-    page += "Departure: <input name='departure' style='margin: 5px; padding: 10px; font-size: 16px;' required><br>";
-    page += "Status: <input name='status' style='margin: 5px; padding: 10px; font-size: 16px;' required><br>";
-    page += "<input type='submit' value='Add' style='padding: 10px 20px; font-size: 18px; background-color: #4CAF50; color: white; border: none; cursor: pointer;'>";
-    page += "</form><br><a href='/' style='text-decoration: none; color: #4CAF50;'>Back to Home</a>";
-    server.send(200, "text/html", page);
+    DynamicJsonDocument doc(1024);
+    
+    // Add each flight to the JSON document
+    for (const auto& t : travels) {
+        JsonObject flight = doc.createNestedObject();
+        flight["flightNumber"] = t.flightNumber;
+        flight["gate"] = t.gate;
+        flight["destination"] = t.destination;
+        flight["boarding"] = t.boarding;
+        flight["departure"] = t.departure;
+        flight["status"] = t.status;
+    }
+
+    // Convert the JSON document to a string
+    String out;
+    serializeJson(doc, out);
+
+    // Send the flight data as JSON
+    server.send(200, "application/json", out);  // Serve the flight data as JSON
   }
 }
 
 void handleFlights() {
-    String page = "<h2>Flights List</h2><table border='1'><tr><th>Flight Number</th><th>Gate</th><th>Destination</th><th>Boarding Time</th><th>Departure Time</th><th>Status</th></tr>";
-
-    // Recorrer el vector de vuelos y mostrarlos en una tabla HTML
+    // Create a JSON document
+    StaticJsonDocument<1024> doc;
+    
+    // Loop through the travels vector and add each flight to the JSON document
     for (const auto& t : travels) {
-        page += "<tr><td>" + t.flightNumber + "</td><td>" + t.gate + "</td><td>" + t.destination + "</td><td>" + t.boarding + "</td><td>" + t.departure + "</td><td>" + t.status + "</td></tr>";
+        JsonObject flight = doc.createNestedObject();
+        flight["flightNumber"] = t.flightNumber;
+        flight["gate"] = t.gate;
+        flight["destination"] = t.destination;
+        flight["boarding"] = t.boarding;
+        flight["departure"] = t.departure;
+        flight["status"] = t.status;
     }
 
-    page += "</table>";
-    server.send(200, "text/html", page);  // Mostrar la página con la lista de vuelos
+    // Convert the JSON document to a string
+    String out;
+    serializeJson(doc, out);
+
+    // Send the JSON data as the response
+    server.send(200, "application/json", out);  // Serve as JSON
 }
 
-
 void handleRoot() {
-    String page = "<h2>Add New Flight</h2><form method='POST' action='/addFlight'>";
-    page += "Flight Number: <input name='flightNumber' required><br>";
-    page += "Gate: <input name='gate' required><br>";
-    page += "Destination: <input name='destination' required><br>";
-    page += "Boarding: <input name='boarding' required><br>";
-    page += "Departure: <input name='departure' required><br>";
-    page += "Status: <input name='status' required><br>";
-    page += "<input type='submit' value='Add Flight'>";
-    page += "</form><br><a href='/flights'>View Flights</a>";
-    server.send(200, "text/html", page);  // Mostrar la página HTML al usuario
+    // Create a JSON document to store the flight data
+    StaticJsonDocument<1024> doc;
+
+    // Loop through the travels vector and add each flight to the JSON document
+    for (const auto& t : travels) {
+        JsonObject flight = doc.createNestedObject();
+        flight["flightNumber"] = t.flightNumber;
+        flight["gate"] = t.gate;
+        flight["destination"] = t.destination;
+        flight["boarding"] = t.boarding;
+        flight["departure"] = t.departure;
+        flight["status"] = t.status;
+    }
+
+    // Convert the JSON document to a string
+    String out;
+    serializeJson(doc, out);
+
+    // Send the JSON data as the response
+    server.send(200, "application/json", out);  // Serve as JSON
 }
 
 void handleAddFlight() {
@@ -155,14 +184,41 @@ void handleDataJson() {
   server.send(200, "application/json", out);
 }
 
+void handleUpdateFlight() {
+    String flightNumber = server.arg("flightNumber");
+    String gate = server.arg("gate");
+    String destination = server.arg("destination");
+    String boarding = server.arg("boarding");
+    String departure = server.arg("departure");
+    String status = server.arg("status");
+
+    for (auto& t : travels) {
+        if (t.flightNumber == flightNumber) {
+            t.gate = gate;
+            t.destination = destination;
+            t.boarding = boarding;
+            t.departure = departure;
+            t.status = status;
+            saveDataFlightFlight();  // Save the updated data
+            server.send(200, "application/json", "{\"status\":\"success\"}");
+            return;
+        }
+    }
+
+    // If flight not found
+    server.send(404, "application/json", "{\"status\":\"error\",\"message\":\"Flight not found\"}");
+}
+
 void setupWebServer() {
   server.on("/", HTTP_GET, handleRoot);
   server.on("/flights", HTTP_GET, handleFlights);
   server.on("/add-flights", HTTP_POST, handleAddFlight);
+  server.on("/upd-flights", HTTP_PUT, handleUpdateFlight);
+  server.on("/weather", HTTP_GET, handleWeather);
   server.on("/admin", handleAdmin);
-  server.on("/news", handleNews);
   server.on("/data.json", handleDataJson);
   server.begin();
+  server.sendHeader("Access-Control-Allow-Origin", "*");
   Serial.println("Web server started.");
 }
 
@@ -185,6 +241,80 @@ void setup() {
   }
 
   setupWebServer();
+}
+
+void saveDataWeather() {
+    Preferences prefs;
+    prefs.begin("weather", false);
+    prefs.putUInt("count", wthr.size());  // Store the number of weather entries
+    for (int i = 0; i < wthr.size(); i++) {
+        prefs.putString(("temp" + String(i)).c_str(), wthr[i].temperature);
+        prefs.putString(("hum" + String(i)).c_str(), wthr[i].humidity);
+        prefs.putString(("cond" + String(i)).c_str(), wthr[i].condition);
+    }
+    prefs.end();
+}
+
+void loadDataWeather() {
+    Preferences prefs;
+    prefs.begin("weather", true);
+    int count = prefs.getUInt("count", 0);
+    wthr.clear();
+    for (int i = 0; i < count; i++) {
+        Weather w;
+        w.temperature = prefs.getString(("temp" + String(i)).c_str(), "");
+        w.humidity = prefs.getString(("hum" + String(i)).c_str(), "");
+        w.condition = prefs.getString(("cond" + String(i)).c_str(), "");
+        wthr.push_back(w);
+    }
+    prefs.end();
+}
+
+void handleWeather() {
+    if (onlineMode) {
+        // If there's internet, fetch the latest weather data from the API
+        HTTPClient http;
+        http.begin(weatherApiUrl);
+        int httpCode = http.GET();
+
+        if (httpCode > 0) {
+            String payload = http.getString();
+            Serial.println("Weather data fetched: " + payload);
+
+            // Optionally, you can deserialize and process the JSON data here
+            DynamicJsonDocument doc(1024);
+            deserializeJson(doc, payload);
+
+            // Update weather data vector with fetched data
+            wthr.clear();  // Clear old data
+            for (JsonObject obj : doc.as<JsonArray>()) {
+                Weather weather;
+                weather.temperature = obj["temperature"].as<String>();
+                weather.humidity = obj["humidity"].as<String>();
+                weather.condition = obj["condition"].as<String>();
+                wthr.push_back(weather);
+            }
+            saveDataWeather();  // Save fetched data locally
+        } else {
+            Serial.println("Failed to fetch weather data.");
+        }
+
+        http.end();
+    }
+
+    // Serve the weather data (either fetched or stored locally)
+    String weatherJson = "[";
+    for (const auto& w : wthr) {
+        JsonObject weather = doc.createNestedObject();
+        weather["temperature"] = w.temperature;
+        weather["humidity"] = w.humidity;
+        weather["condition"] = w.condition;
+    }
+    String out;
+    serializeJson(doc, out);
+
+    // Send the JSON data as the response
+    server.send(200, "application/json", out);  // Serve as JSON
 }
 
 void loop() {
