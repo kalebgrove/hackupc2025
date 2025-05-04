@@ -1,0 +1,1 @@
+ESP32 slave backend pulls the data from the master backend, and the master backend pulls the data from the server (the one in ../backend directory)

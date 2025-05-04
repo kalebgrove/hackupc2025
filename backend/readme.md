@@ -1,0 +1,1 @@
+The backend of the server. We do API calls to Weather API and we simulate API calls for flight data. This data is synchronized to the ESP32s.
