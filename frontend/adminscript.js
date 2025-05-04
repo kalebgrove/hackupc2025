@@ -23,6 +23,32 @@ function addFlightRow(flightNumber, gate, destination, boardingTime, departureTi
 
     // Append the new row to the table's body
     flightTableBody.appendChild(row);
+
+    const flightData = {
+        "flightnumber": flightNumber,
+        "gate": gate,
+        "destination": destination,
+        "boarding_time": boardingTime,
+        "departure_time": departureTime,
+        "status": status
+    }
+    console.log(flightData);
+
+    fetch('http://10.192.136.63:5000/add-flight-admin', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(flightData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => {  // Get error message from JSON
+                throw new Error(err.error || 'Failed to update flight data'); // Use err.error if available
+            });
+        }
+        return response.json();
+    })
 }
 
 // 2. Function to handle the "Edit" button click
