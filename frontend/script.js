@@ -10,7 +10,7 @@ let isBlackout = false;
 async function fetchWeather() {
   try {
     let found = false;
-    const response = await fetch('http://<esp>/weather');
+    const response = await fetch('http://10.192.136.63:5000/weather');
     if (!response.ok) throw new Error("Network response was not ok");
 
     const flights = await response.json();
@@ -42,7 +42,7 @@ async function fetchWeather() {
 async function fetchData() {
     try {
       let found = false;
-      const response = await fetch('http://<esp>/flights');
+      const response = await fetch('http://10.192.136.63:5000/flights');
       if (!response.ok) throw new Error("Network response was not ok");
   
       const flights = await response.json();

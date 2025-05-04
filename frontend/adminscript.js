@@ -68,7 +68,7 @@ function saveRow(buttonElement) {
         status: status
     };
 
-    fetch(`http://<esp>/flights/${flightNumber}`, {
+    fetch(`http://10.192.136.63:5000/flights/${flightNumber}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -110,7 +110,7 @@ function saveRow(buttonElement) {
 async function fetchDataAdmin() {
     try {
         // Fetch data from the specified URL
-        const response = await fetch('http://<esp>/flights');
+        const response = await fetch('http://10.192.136.63:5000/flights');
         // If the response is not successful, throw an error
         if (!response.ok) {
             throw new Error("Network response was not ok");
